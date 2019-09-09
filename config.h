@@ -9,6 +9,8 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#define SERIAL
+
 const bool IS_OTAA = false;   ///< LoRaWAN authorization method, ABP or OTAA
 
 /*OTAA credential*/

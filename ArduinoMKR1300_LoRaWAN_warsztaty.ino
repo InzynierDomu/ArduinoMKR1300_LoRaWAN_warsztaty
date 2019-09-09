@@ -19,9 +19,11 @@ int internal_counter = 0;   ///< counter for sending interval
 void setup()
 {
   GPIO_setup();
-
+  
+#ifdef SERIAL 
   Serial.begin(115200);
   while (!Serial);
+#endif /* SERIAL */  
 
   LoRaWAN_setup();
   digitalWrite(LED_PIN, 0);
@@ -54,14 +56,13 @@ void loop()
   modem.beginPacket();
   modem.print(msg);
   err = modem.endPacket(true);
-#ifndef SERIAL  
+ 
   if (err > 0) {
     Serial.print("Message sent correctly!");
   } else {
     Serial.print("Error sending message");
     Serial.println(err);
-  }  
-#endif /* SERIAL */  
+  }
 
   if (modem.available()==0) {
     Serial.println("No downlink message received at this time.");
@@ -71,15 +72,13 @@ void loop()
   int i = 0;
   while (modem.available()) {
     rcv[i++] = (char)modem.read();
-  }
-#ifndef SERIAL   
+  } 
   Serial.print("Received: ");
   for (unsigned int j = 0; j < i; j++) {
     Serial.print(rcv[j] >> 4, HEX);
     Serial.print(rcv[j] & 0xF, HEX);
     Serial.print(" ");
-  }
-#endif /* SERIAL */    
+  } 
 }
 
 /**
@@ -106,14 +105,12 @@ void LoRaWAN_setup()
       digitalWrite(LED_PIN, 0);
       delay(1000);
     }
-  };
-#ifndef SERIAL     
+  };    
   Serial.print("Module start correct");
   Serial.print("Module version is: ");
   Serial.println(modem.version());
   Serial.print("Device EUI is: ");
   Serial.println(modem.deviceEUI());
-#endif /* SERIAL */ 
   int connected = 0;
   if (IS_OTAA){
     connected = modem.joinOTAA(APPEUI, APPKEY, DEVEUI);
@@ -133,5 +130,4 @@ void LoRaWAN_setup()
   }
   modem.dataRate(0);
   delay(1000);
-//  modem.minPollInterval(60);
 }
